@@ -1,0 +1,122 @@
+1)
+import numpy as np
+import matplotlib.pyplot as plt
+
+#Матриця переходів нижче
+n_states = 7
+P = np.random.rand(n_states, n_states)
+P /= P.sum(axis=1, keepdims=True)
+
+print("матриця переходів: ")
+print(P)
+
+..........
+
+2)
+#Створюємо функцію, яка моделює нам шлях
+def simulate_chain(P, start_state, n_steps=10):
+    states = [start_state]
+    state = start_state
+    for _ in range(n_steps):
+        state = np.random.choice(n_states, p=P[state])
+        states.append(state)
+    return states
+#Пишемо кількість симуляцій і кроків
+n_realizations = 200
+n_steps = 10
+
+chains = []
+for _ in range(n_realizations):
+    start = np.random.choice(n_states) #Випадковий стан для симуляції
+    chain = simulate_chain(P, start, n_steps)
+    chains.append(chain)
+
+print(f"\nкількість реалізацій: {len(chains)}, довжина всіх реалізацій: {n_steps + 1}")
+
+..........
+
+3)
+#Теоретична матриця переходів
+print("\nтеоретична матриця переходів: ")
+print(P)
+#Експериментальна матриця переходів
+transition_counts = np.zeros((n_states, n_states))
+#Рахуємо скільки було симуляцій
+for chain in chains:
+    for i in range(len(chain) - 1):
+        transition_counts[chain[i], chain[i+1]] += 1
+P_experimental = transition_counts / transition_counts.sum(axis=1, keepdims=True)
+#Тут нормалізуємо
+print("\nекспериментальна матриця переходів: ")
+print(P_experimental) #Стаціонарний розподіл π
+
+#Рахуємо експериментальний час перебування у станах
+state_visits = np.zeros(n_states)
+
+for chain in chains:
+    for state in chain:
+        state_visits[state] += 1
+total_steps = n_realizations * (n_steps + 1)
+state_visit_frequencies = state_visits / totals_steps
+#В цій for ми рахуємо частку часу для кожного стану
+
+print("\nекспериментальні частоти перебування у кожному стані: ")
+print(state_visit_frequencies)
+
+#Порівнюємо стаціонарний та експериментальні частоти
+print("\nпорівняння стаціонарного розподілу і середнього розподілу: ")
+print("теоретичний стаціонарний розподіл: ")
+print(pi)
+print("експериментальний розподіл: ")
+print(state_visit_frequencies)
+
+.........
+
+4)
+#Матриці переходів для 7 кроків
+n_states_nonhom = 5
+P_list = []
+
+for _ in range(7):
+    P_k = np.random.rand(n_states_nonhom, n_states_nonhom)
+    P_k = P_k.sum(axis=1, keepdims=True)
+    P_list.append(P_k)
+
+print("\nматриці переходів для неоднорідного ланцюга (кроки): ")
+for idx, Pk in enumerate(P_list):
+    print(f"\nкрок {idx+1}:")
+    print(Pk)
+
+#Симуляція реалізацій неоднорідного ланцюга
+def simulate_nonhomogeneous_chain(P_list, start_state):
+    states = [start_state]
+    state = start_state
+    for P_k in P_list:
+        state = np.random.choice(n_states_nonhom, p=P_k[state])
+        states.append(state)
+    return states
+
+nonhomogeneous_chains = []
+#10 реалізацій
+for _ in range(10): 
+    start = np.random.choice(n_states_nonhom)
+    chain = simulate_nonhomogeneous_chain(P_list, start)
+    nonhomogeneous_chains.append(chain)
+
+print("\nреалізації неоднорідного ланцюга: ")
+for idx, chain in enimerate(nonhomogeneous_chains):
+    print(f"реалізація {idx+1}: {chain}")
+
+#Ймовірність перебування у кожному стані після кроку
+steps = len(P_list) + 1 #7 переходів це 8 станів
+step_counts = np.zeros((steps, n_states_nonhom))
+
+for chain in nonhomogeneous_chains:
+    for step_idx, state in enemurate(chain):
+        step_counts[step_idx, state] += 1
+
+step_frequencies = step_counts / len(nonhomogeneous_chains)
+
+print("\nймовірність перебування у кожному стані після кожного кроку:")
+for step_idx in range(steps):
+    print(f"\nкрок {step_idx}: {step_frequencies[step_idx]}")
