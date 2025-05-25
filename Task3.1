@@ -1,0 +1,79 @@
+1)
+import numpy as np
+import matplotlib.pyplot as plt
+
+
+#Задаємо матрицю переходів
+n_states = 7 #кількість станів
+#Створюємо пусті
+P = np.zeros((n_states, n_states))
+#Заповнюємо від 0 до 4
+for i in range(5):
+    row = np.random.rand(n_states)
+    row /= row.sum() #Тут ділимо всі ряди на їх суми щоб сума всіх значень була 0
+    P[i] = row #Записуємо i в P
+#Робимо поглинаючі
+P[5, 5] = 1.0
+P[6, 6] = 1.0
+print("матриця переходів: ") #Виводимо
+print(P)
+
+#Звідси дістаємо підматриці Q і R, або зводимо до канонічної форми. А потім поглинаючі
+Q = P[:5, :5] #перехідний-перехідний
+R = P[:5, 5:] #перехідний-поглинаючий
+
+print("\nпідматриця Q(перехідний-перехідний): ")
+print(Q)
+print("\nпідматриця R(перехідний-поглинаючий): ")
+print(R)
+
+...........
+
+2)
+#Додаємо змінну для підрахунку відвідувань станів
+state_visit_counts = np.zeros(n_states, dtype=int)
+
+#звідси симулюємо
+n_simulations = 1000
+#зберігаємо кількість кроків до поглинання та фінального стану
+absorption_times = [] 
+final_states = []
+
+
+def simulate_single_absorption(P, start_state): #Створюємо функцію яка симулює один прохід
+    state = start_state
+    steps = 0
+    local_visits = np.zeros(n_states, dtype=int) #Підрахунок відвідувань в симуляції 
+    while state not in [5, 6]: #Поглинаємо 5 і 6
+        local_visits[state] += 1 #Записуємо відвідування перехідного стану
+        state = np.random.choice(n_states, p=P[state])
+        steps += 1
+    local_visits[state] += 1 #Записуємо відвідування поглинаючого стану
+    return steps, state, local_visits #Повертаємо масив відвідувань
+
+#Записуємо симуляцію
+for _ in range(n_simulations):
+    start_state = np.random.choice([0,1,2,3,4]) #Стартуємо з випадкового перехідного
+    steps, final_state, local_visits = simulate_single_absorption(P, start_state) #Приймаємо масив відвідувань
+    absorption_times.append(final_state)
+    state_visit_counts += local_visits
+#Тут ми додали відвідування зі всіх симуляцій
+
+...........
+
+3)
+print("\nРЕЗУЛТАТИ СИМУЛЯЦІЙ")
+print(f"в середньому кроків до поглинання: {np.mean(absorption_times):.2f}")
+
+#Рахуємо поглинання до станів 5 і 6
+final_counts = np.bincount(final_states, minlength=n_states)
+absorption_prob_simulated = final_counts[5:7] / n_simulations
+print(f"ймовірність поглинання з симуляцій до станів 6 і 7: {absorption_prob_simulated}")
+
+#Результати
+print("\nкількість відвідувань кожного стану (за всі симуляції): ")
+print(state_visit_counts)
+
+avg_state_visits_per_run = state_visit_counts / n_simulations
+print("\nсередня кількість відвідувань кожного стану за одну симуляцію: ")
+print(avg_state_visits_per_run)
